@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + TS</title>
+</head>
+
+<body>
+
+    <header>
+        <h1>Screen Recorder by JoseIsaac6858</h1>
+    </header>
+    <main>
+        <form id="session-form" class="session-form">
+            <h2>Start new Session</h2>
+            <div class="session-form-main">
+                <div class="session-form-igroup">
+                    <label for="session-name">name</label>
+                    <input type="text" name="session-name" id="session-name">
+                </div>
+                <p class="session-form-message" data-item-id="message"></p>
+                <button type="submit">start recording</button>
+            </div>
+        </form>
+        <div class="sessions-shelf" id="shelf">
+        </div>
+    </main>
+
+    <template id="session-template">
+        <div class="session">
+            <video src="" class="session-cover">
+            </video>
+            <div class="session-main" data-item-id="main">
+                <h2 data-item-id="title">session name</h2>
+                <button type="button" class="session-pause" title="pause recording"
+                    data-item-id="pause-button">pause</button>
+                <button type="button" class="session-end" title="end recording" data-item-id="end-button">end</button>
+                <a href="#" class="session-end" title="end recording" data-item-id="download-button"
+                    aria-hidden="true">download</a>
+            </div>
+        </div>
+    </template>
+
+    <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
