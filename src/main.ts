@@ -28,10 +28,8 @@ async function handleSubmit(event: MouseEvent) {
     map.set(session.id, session);
 
     session.endCallback = sessionEndCallbackFactory(sessionElemetOnShelf);
-
-    const stopSession = stopSessionFactory(session);
-    sessionElemetOnShelf.onEnd = stopSession;
-    sessionElemetOnShelf.onPause = stopSession;
+    sessionElemetOnShelf.onEnd = stopSessionFactory(session);
+    sessionElemetOnShelf.onPause = pauseSessionFactory(session);
 
     shelf.appendChild(sessionElemetOnShelf);
     resetForm();
@@ -44,6 +42,9 @@ function resetForm() {
 
 function stopSessionFactory(session: Session): () => void {
     return () => session.stop();
+}
+function pauseSessionFactory(session: Session): () => void {
+    return () => session.pause();
 }
 
 function sessionEndCallbackFactory(sessionElemetOnShelf: SessionElement): (file: File) => void {

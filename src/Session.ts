@@ -29,6 +29,12 @@ class Session {
         const file = new File([blob], "yourfilename.mp4", { type: mimeType });
         if (this.endCallback) this.endCallback(file)
     }
+    pause() {
+        if (this.recorder.state === "paused") {
+            return this.recorder.resume();
+        }
+        this.recorder.pause();
+    }
     static stopStream(stream: MediaStream) {
         stream.getTracks().forEach(function (track) {
             track.stop();
