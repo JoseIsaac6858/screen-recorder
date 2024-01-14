@@ -43,8 +43,9 @@ function resetForm() {
 function stopSessionFactory(session: Session): () => void {
     return () => session.stop();
 }
+
 function pauseSessionFactory(session: Session): () => void {
-    return () => session.pause();
+    return () => session.togglePause();
 }
 
 function sessionEndCallbackFactory(sessionElemetOnShelf: SessionElement): (file: File) => void {

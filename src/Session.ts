@@ -29,7 +29,7 @@ class Session {
         const file = new File([blob], "yourfilename.mp4", { type: mimeType });
         if (this.endCallback) this.endCallback(file)
     }
-    pause() {
+    togglePause() {
         if (this.recorder.state === "paused") {
             return this.recorder.resume();
         }
