@@ -3,7 +3,7 @@ const displayConfig: DisplayMediaStreamOptions = {
         displaySurface: "window",
     }
 };
-const mimeType = "video/webm";
+const mimeType = "video/webm; codecs=vp8";
 class Session {
     readonly id: string;
     private recorder: MediaRecorder;
@@ -15,7 +15,9 @@ class Session {
         this.recorder = new MediaRecorder(MediaStream, {
             mimeType: mimeType,
         });
-        this.recorder.ondataavailable = (event) => recordedData.push(event.data);
+        this.recorder.ondataavailable = (event) => {
+            recordedData.push(event.data)
+        };
         this.recorder.onstop = this.stop.bind(this);
         this.recorder.start();
         this.stream = MediaStream;
@@ -24,9 +26,11 @@ class Session {
     }
     stop() {
         if (this.stream.active) Session.stopStream(this.stream);
-        this.recorder.stop();
+        if (this.recorder.state === "recording") {
+            this.recorder.stop();
+        }
         const blob = new Blob(this.data, { type: mimeType });
-        const file = new File([blob], "yourfilename.mp4", { type: mimeType });
+        const file = new File([blob], `${this.id}.webm`, { type: mimeType });
         if (this.endCallback) this.endCallback(file)
     }
     togglePause() {
