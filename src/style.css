@@ -116,7 +116,7 @@ main {
     height: auto;
     border-top-left-radius: 1.25rem;
     border-top-right-radius: 1.25rem;
-    background-image: url("/public/600x400.svg");
+    background-image: url("/600x400.svg");
     background-size: cover;
     background-position: center;
 }
