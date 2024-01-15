@@ -23,7 +23,7 @@ const ElementsQuery = {
     downloadButton: '[data-item-id="download-button"]',
 }
 
-class SessionElement extends DocumentFragment {
+class RecordingSessionElement extends HTMLElement {
     readonly id: string;
     readonly name: string;
     onEnd: callback | undefined;
@@ -35,15 +35,15 @@ class SessionElement extends DocumentFragment {
         return this.#isFinished;
     }
 
-    constructor(props: props) {
+    constructor(props?: Partial<props>) {
         super();
         this.#isFinished = false;
-        this.id = props.id;
-        this.name = props.name;
-        this.onEnd = props.onEnd;
-        this.onPause = props.onPause;
+        this.id = props?.id || "";
+        this.name = props?.name || "";
+        this.onEnd = props?.onEnd;
+        this.onPause = props?.onPause;
 
-        const Root = SessionElement.useTemplate(props);
+        const Root = RecordingSessionElement.useTemplate(props);
         const pauseButton = Root.querySelector<HTMLButtonElement>(ElementsQuery.pauseButton)!;
         const endButton = Root.querySelector<HTMLButtonElement>(ElementsQuery.endButton)!;
 
@@ -58,7 +58,7 @@ class SessionElement extends DocumentFragment {
         if (this.onPause) this.onPause(event);
         if (event.defaultPrevented) return;
         const pauseButton = this.root.querySelector<HTMLButtonElement>(ElementsQuery.pauseButton)!;
-        if (pauseButton.title === "pause"){
+        if (pauseButton.title === "pause") {
             pauseButton.title = "resume";
         } else {
             pauseButton.title = "pause";
@@ -95,19 +95,22 @@ class SessionElement extends DocumentFragment {
         downloadButton.removeAttribute("aria-hidden");
     }
 
-    private static useTemplate(props: SessionDescriptor) {
+    private static useTemplate(props?: Partial<SessionDescriptor>) {
         const template = document.getElementById("session-template") as HTMLTemplateElement;
         const clone = template.content.children[0]!.cloneNode(true) as HTMLDivElement;
+        if (!props) return clone;
         const title = clone.querySelector<HTMLHeadingElement>(ElementsQuery.title)!;
         const kind = clone.querySelector<HTMLHeadingElement>(ElementsQuery.kind)!;
         const label = clone.querySelector<HTMLHeadingElement>(ElementsQuery.label)!;
         const duration = clone.querySelector<HTMLHeadingElement>(ElementsQuery.duration)!;
-        title.textContent = props.name;
-        kind.textContent = props.kind;
-        label.textContent = props.label;
-        duration.textContent = props.duration;
+        if (props.name) title.textContent = props.name;
+        if (props.kind) kind.textContent = props.kind;
+        if (props.label) label.textContent = props.label;
+        if (props.duration) duration.textContent = props.duration;
         return clone;
     }
 }
 
-export default SessionElement;
+customElements.define("recording-session", RecordingSessionElement);
+
+export default RecordingSessionElement;

@@ -1,6 +1,6 @@
 import Session from './Session';
 import './style.css';
-import SessionElement from './templates/session.temp';
+import RecordingSessionElement from './components/recording-session';
 
 const shelf = document.getElementById("shelf")! as HTMLDivElement;
 const sessionForm = document.getElementById("session-form")! as HTMLFormElement;
@@ -24,7 +24,7 @@ async function handleSubmit(event: MouseEvent) {
         return;
     }
     const session = await Session.create();
-    const sessionElemetOnShelf = new SessionElement({
+    const sessionElemetOnShelf = new RecordingSessionElement({
          id: session.id, name,
          duration: "",
          kind: "",
@@ -53,7 +53,7 @@ function pauseSessionFactory(session: Session): () => void {
     return () => session.togglePause();
 }
 
-function sessionEndCallbackFactory(sessionElemetOnShelf: SessionElement): (file: File) => void {
+function sessionEndCallbackFactory(sessionElemetOnShelf: RecordingSessionElement): (file: File) => void {
     return (file: File) => {
         if (map.has(sessionElemetOnShelf.id)) map.delete(sessionElemetOnShelf.id);
         sessionElemetOnShelf.finish({
