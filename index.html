@@ -30,18 +30,43 @@
     </main>
 
     <template id="session-template">
-        <div class="session">
-            <video src="" class="session-cover">
-            </video>
-            <div class="session-main" data-item-id="main">
-                <h2 data-item-id="title">session name</h2>
-                <button type="button" class="session-pause" title="pause recording"
-                    data-item-id="pause-button">pause</button>
-                <button type="button" class="session-end" title="end recording" data-item-id="end-button">end</button>
-                <a href="#" class="session-end" title="end recording" data-item-id="download-button"
-                    aria-hidden="true" download>download</a>
+        <article class="session">
+            <figure class="video-area">
+                <video src=""></video>
+                <div>
+                    <span aria-label="name">name</span>
+                    <h2 aria-labelledby="name">session name</h2>
+                </div>
+            </figure>
+            <div class="session-row">
+                <div>
+                    <span aria-label="kind">kind</span>
+                    <p aria-labelledby="kind">video/audio</p>
+                </div>
+                <div>
+                    <span aria-label="label">label</span>
+                    <p aria-labelledby="label">window 1</p>
+                </div>
             </div>
-        </div>
+            <div class="session-row">
+                <div>
+                    <span aria-label="duration">duration</span>
+                    <p aria-labelledby="duration">18:00</p>
+                    <span aria-label="duration">minutes</span>
+                </div>
+                <div>
+                    <button type="button" class="session-button" data-item-id="pause-button"
+                        title="pause"></button>
+                    <button type="button" class="session-button" title="end recording"
+                        data-item-id="end-button"></button>
+                    <a href="#" class="session-button" title="end recording" data-item-id="download-button"
+                        aria-hidden="true" target="_blank" download>
+                        download
+                    </a>
+                </div>
+            </div>
+            <div class="session-fill"></div>
+        </article>
     </template>
 
     <script type="module" src="/src/main.ts"></script>

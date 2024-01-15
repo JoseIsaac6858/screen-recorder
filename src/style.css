@@ -91,6 +91,7 @@ main {
 .session-form button[type="submit"] {
     width: 100%;
 }
+
 .session-form-message {
     display: block;
     margin: .2rem;
@@ -103,15 +104,119 @@ main {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 2rem;
-    padding-top: 2rem;
+    padding: 2rem;
 }
 
 .session {
     border-radius: 1.25rem;
     border: 1px solid gray;
+    display: flex;
+    flex-direction: column;
 }
 
-.session video {
+.session-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.session-row > * {
+    background-color: #1a1a1a;
+    border: 1px solid #242424;
+    padding: .2rem .5rem;
+}
+
+.session-fill {
+    flex: 1 1 100%;
+    min-height: 1.5rem;
+    border-bottom-left-radius: inherit;
+    border-bottom-right-radius: inherit;
+    background-color: #1a1a1a;
+    border-top: 1px solid #242424;
+}
+
+.session-row p {
+    margin: 0;
+}
+
+.session span[aria-label] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+}
+
+.session-button {
+    display: inline-block;
+    text-decoration: none;
+    color: inherit;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    position: relative;
+    width: 1.2em;
+    height: 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    background-color: #1a1a1a;
+    cursor: pointer;
+    transition: border-color 0.25s;
+}
+.session-button[data-item-id="download-button"] {
+    width: initial;
+    height: initial;
+    padding: 0.6em 1.2em;
+}
+
+.session-button[aria-hidden="true"] {
+    display: none;
+}
+
+.session-button:hover {
+    border-color: #646cff;
+}
+
+.session-button:focus,
+.session-button:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
+}
+
+.session-button::before,
+.session-button::after {
+    position: absolute;
+    width: .5rem;
+    height: .5rem;
+    background-color: currentColor;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.session-button[data-item-id="pause-button"][title="pause"]::after {
+    content: "";
+    width: 0.2rem;
+    height: 0.65rem;
+    background-color: transparent;
+    border-color: currentColor;
+    border-left: .2rem solid;
+    border-right: .2rem solid;
+}
+
+.session-button[data-item-id="pause-button"][title="play"]::after {
+    content: "";
+    clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+}
+
+.session-button[data-item-id="end-button"]::after {
+    content: "";
+}
+
+.video-area {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin: 0;
+}
+
+.video-area video {
     width: 100%;
     height: auto;
     border-top-left-radius: 1.25rem;
@@ -121,41 +226,22 @@ main {
     background-position: center;
 }
 
-.session-main {
-    padding: 1rem;
+.video-area div {
+    font-size: .8rem;
+    padding: .25rem 1rem;
+    background-color: #1a1a1a;
+    border: 1px solid #242424;
+    position: relative;
+    text-align: center;
 }
-.session-main h2 {
+
+.video-area h2 {
     margin: 0;
 }
-.session a,
-.session button {
-    display: inline-block;
-    text-decoration: none;
-    color: inherit;
-    border-radius: 8px;
-    border: 1px solid transparent;
-    padding: 0.6em 1.2em;
-    font-size: 1em;
-    font-weight: 500;
-    font-family: inherit;
-    background-color: #1a1a1a;
-    cursor: pointer;
-    transition: border-color 0.25s;
-}
 
-.session a[aria-hidden="true"],
-.session button[aria-hidden="true"] {
-    display: none;
-}
-
-.session a:hover,
-.session button:hover {
-    border-color: #646cff;
-}
-
-.session a:focus,
-.session button:focus,
-.session a:focus-visible,
-.session button:focus-visible {
-    outline: 4px auto -webkit-focus-ring-color;
+.video-area div span {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
 }

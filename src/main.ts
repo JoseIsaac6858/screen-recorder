@@ -24,7 +24,12 @@ async function handleSubmit(event: MouseEvent) {
         return;
     }
     const session = await Session.create();
-    const sessionElemetOnShelf = new SessionElement({ id: session.id, name, });
+    const sessionElemetOnShelf = new SessionElement({
+         id: session.id, name,
+         duration: "",
+         kind: "",
+         label: "",
+         });
     map.set(session.id, session);
 
     session.endCallback = sessionEndCallbackFactory(sessionElemetOnShelf);

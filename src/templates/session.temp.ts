@@ -1,6 +1,9 @@
 interface SessionDescriptor {
     id: string;
     name: string;
+    kind: string;
+    label: string;
+    duration: string;
 }
 
 interface props extends SessionDescriptor {
@@ -8,11 +11,13 @@ interface props extends SessionDescriptor {
     onPause?: callback;
 }
 
-type callback = (prams: Omit<SessionDescriptor, "image">) => void;
+type callback = (prams: MouseEvent) => void;
 const ElementsQuery = {
     video: 'video',
-    title: '[data-item-id="title"]',
-    main: '[data-item-id="main"]',
+    title: '[aria-labelledby="name"]',
+    kind: '[aria-labelledby="kind"]',
+    label: '[aria-labelledby="label"]',
+    duration: '[aria-labelledby="duration"]',
     pauseButton: '[data-item-id="pause-button"]',
     endButton: '[data-item-id="end-button"]',
     downloadButton: '[data-item-id="download-button"]',
@@ -25,9 +30,11 @@ class SessionElement extends DocumentFragment {
     onPause: callback | undefined;
     #isFinished: boolean;
     root: HTMLDivElement;
+
     get isFinished() {
         return this.#isFinished;
     }
+
     constructor(props: props) {
         super();
         this.#isFinished = false;
@@ -36,7 +43,7 @@ class SessionElement extends DocumentFragment {
         this.onEnd = props.onEnd;
         this.onPause = props.onPause;
 
-        const Root = SessionElement.create(props);
+        const Root = SessionElement.useTemplate(props);
         const pauseButton = Root.querySelector<HTMLButtonElement>(ElementsQuery.pauseButton)!;
         const endButton = Root.querySelector<HTMLButtonElement>(ElementsQuery.endButton)!;
 
@@ -46,24 +53,39 @@ class SessionElement extends DocumentFragment {
         this.appendChild(Root);
         this.root = Root;
     }
-    private handlePause(event: MouseEvent) {
-        event.preventDefault();
-        if (this.onPause) this.onPause({ id: this.id, name: this.name });
+
+    private handlePause(event: MouseEvent): void {
+        if (this.onPause) this.onPause(event);
+        if (event.defaultPrevented) return;
+        const pauseButton = this.root.querySelector<HTMLButtonElement>(ElementsQuery.pauseButton)!;
+        if (pauseButton.title === "pause"){
+            pauseButton.title = "resume";
+        } else {
+            pauseButton.title = "pause";
+        }
     }
-    private handleEnd(event: MouseEvent) {
-        event.preventDefault();
-        if (this.onEnd) this.onEnd({ id: this.id, name: this.name });
-    }
-    finish({ url }: { url: string }) {
-        const downloadButton = this.root.querySelector<HTMLLinkElement>(ElementsQuery.downloadButton)!;
-        const videoElement = this.root.querySelector<HTMLVideoElement>(ElementsQuery.video)!;
-        downloadButton.target = "__blank";
-        downloadButton.href = url;
-        videoElement.src = url;
-        videoElement.setAttribute("controls", "true");
-        // i'm coding again
+
+    private handleEnd(event: MouseEvent): void {
+        if (this.onEnd) this.onEnd(event);
+        if (event.defaultPrevented) return;
         this.changeButtonVisibility();
     }
+
+    finish({ url }: { url: string }) {
+        const downloadButton = this.root.querySelector<HTMLLinkElement>(ElementsQuery.downloadButton)!;
+        downloadButton.href = url;
+        this.setVideo(url)
+    }
+
+    setVideo(url: string | MediaProvider): void {
+        const videoElement = this.root.querySelector<HTMLVideoElement>(ElementsQuery.video)!;
+        if (typeof url === "string") {
+            videoElement.src = url;
+            return;
+        }
+        videoElement.srcObject = url;
+    }
+
     private changeButtonVisibility() {
         const downloadButton = this.root.querySelector<HTMLLinkElement>(ElementsQuery.downloadButton)!;
         const pauseButton = this.root.querySelector<HTMLButtonElement>(ElementsQuery.pauseButton)!;
@@ -72,11 +94,18 @@ class SessionElement extends DocumentFragment {
         endButton.setAttribute("aria-hidden", "true");
         downloadButton.removeAttribute("aria-hidden");
     }
-    static create(props: SessionDescriptor) {
+
+    private static useTemplate(props: SessionDescriptor) {
         const template = document.getElementById("session-template") as HTMLTemplateElement;
         const clone = template.content.children[0]!.cloneNode(true) as HTMLDivElement;
         const title = clone.querySelector<HTMLHeadingElement>(ElementsQuery.title)!;
+        const kind = clone.querySelector<HTMLHeadingElement>(ElementsQuery.kind)!;
+        const label = clone.querySelector<HTMLHeadingElement>(ElementsQuery.label)!;
+        const duration = clone.querySelector<HTMLHeadingElement>(ElementsQuery.duration)!;
         title.textContent = props.name;
+        kind.textContent = props.kind;
+        label.textContent = props.label;
+        duration.textContent = props.duration;
         return clone;
     }
 }
