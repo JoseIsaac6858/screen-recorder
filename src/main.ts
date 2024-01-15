@@ -1,6 +1,7 @@
 import Session from './Session';
 import './style.css';
-import RecordingSessionElement from './components/recording-session';
+import RecordingSessionElement, { props } from './components/recording-session';
+import { SecondsToHHMMSS } from './utils/time.utils';
 
 const shelf = document.getElementById("shelf")! as HTMLDivElement;
 const sessionForm = document.getElementById("session-form")! as HTMLFormElement;
@@ -24,20 +25,28 @@ async function handleSubmit(event: MouseEvent) {
         return;
     }
     const session = await Session.create();
-    const sessionElemetOnShelf = new RecordingSessionElement({
-         id: session.id, name,
-         duration: "",
-         kind: "",
-         label: "",
-         });
+    const sessionElemetOnShelf = new RecordingSessionElement(extractElementProps(session, name));
     map.set(session.id, session);
+    sessionElemetOnShelf.video = session.stream;
 
     session.endCallback = sessionEndCallbackFactory(sessionElemetOnShelf);
+    session.onDurationChange = (duration: number) => {
+        sessionElemetOnShelf.duration = duration;
+    }
     sessionElemetOnShelf.onEnd = stopSessionFactory(session);
     sessionElemetOnShelf.onPause = pauseSessionFactory(session);
 
     shelf.appendChild(sessionElemetOnShelf);
     resetForm();
+}
+
+function extractElementProps(session: Session, name: string): props {
+    return ({
+        id: session.id, name,
+        kind: session.kind,
+        label: session.label,
+        duration: SecondsToHHMMSS(session.duration),
+    });
 }
 
 function resetForm() {

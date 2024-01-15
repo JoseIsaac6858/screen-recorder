@@ -1,3 +1,5 @@
+import { SecondsToHHMMSS } from "../utils/time.utils";
+
 interface SessionDescriptor {
     id: string;
     name: string;
@@ -74,16 +76,23 @@ class RecordingSessionElement extends HTMLElement {
     finish({ url }: { url: string }) {
         const downloadButton = this.root.querySelector<HTMLLinkElement>(ElementsQuery.downloadButton)!;
         downloadButton.href = url;
-        this.setVideo(url)
+        this.video = url;
     }
 
-    setVideo(url: string | MediaProvider): void {
+    set video(url: string | MediaProvider) {
         const videoElement = this.root.querySelector<HTMLVideoElement>(ElementsQuery.video)!;
         if (typeof url === "string") {
+            videoElement.srcObject = null;
             videoElement.src = url;
             return;
         }
+        videoElement.removeAttribute("src");
         videoElement.srcObject = url;
+    }
+
+    set duration(duration: number) {
+        const durationElement = this.querySelector<HTMLHeadingElement>(ElementsQuery.duration)!;
+        durationElement.textContent = SecondsToHHMMSS(duration);
     }
 
     private changeButtonVisibility() {
@@ -113,4 +122,5 @@ class RecordingSessionElement extends HTMLElement {
 
 customElements.define("recording-session", RecordingSessionElement);
 
+export type { props };
 export default RecordingSessionElement;
