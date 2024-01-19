@@ -11,6 +11,7 @@ const button = sessionForm.querySelector<HTMLButtonElement>('button[type="submit
 const message = sessionForm.querySelector<HTMLParagraphElement>('[data-item-id="message"]')!;
 const nameInput = sessionForm.querySelector<HTMLInputElement>('[name="session-name"]')!;
 const map = new Map<string, Session>();
+
 button.addEventListener("click", handleSubmit);
 window.addEventListener("beforeunload", (event) => {
     if (map.size > 0) {
@@ -22,32 +23,40 @@ window.addEventListener("beforeunload", (event) => {
 async function handleSubmit(event: MouseEvent) {
     event.preventDefault();
     const name = nameInput.value as string;
-    if (!isValidName(name)) {
+    
+    if (name.length <= 0) {
         message.textContent = "invalid name";
         return;
     }
+    
     const session = await Session.create();
-    const sessionElemetOnShelf = new RecordingSessionElement(extractElementProps(session, name));
+    const ElementProps: props = elementPropsFrom(session, name);
+    const $element = new RecordingSessionElement(ElementProps);
+    
     map.set(session.id, session);
-    sessionElemetOnShelf.video = session.stream;
+    $element.video = session.stream;
 
-    session.endCallback = sessionEndCallbackFactory(sessionElemetOnShelf, name);
     session.onDurationChange = (duration: number) => {
-        sessionElemetOnShelf.duration = duration;
-    }
-    sessionElemetOnShelf.onEnd = stopSessionFactory(session);
-    sessionElemetOnShelf.onPause = pauseSessionFactory(session);
-
-    shelf.appendChild(sessionElemetOnShelf);
+        $element.duration = duration;
+    };
+    session.endCallback = (file: File) => {
+        removeSession($element);
+        appendRecordedVideo($element, file);
+    };
+    
+    shelf.appendChild($element);
     resetForm();
 }
 
-function extractElementProps(session: Session, name: string): props {
+function elementPropsFrom(session: Session, name: string): props {
     return ({
-        id: session.id, name,
+        name,
+        id: session.id,
         kind: session.kind,
         label: session.label,
         duration: SecondsToHHMMSS(session.duration),
+        onEnd: session.stop,
+        onPause: session.togglePause,
     });
 }
 
@@ -56,25 +65,15 @@ function resetForm() {
     nameInput.value = "";
 }
 
-function stopSessionFactory(session: Session): () => void {
-    return () => session.stop();
+function appendRecordedVideo($element: RecordingSessionElement, file: File) {
+    const element = new RecordedVideo({
+        title: $element.name,
+        src: URL.createObjectURL(file)
+    });
+    videosShelf.appendChild(element);
 }
 
-function pauseSessionFactory(session: Session): () => void {
-    return () => session.togglePause();
-}
-
-function sessionEndCallbackFactory($element: RecordingSessionElement, title: string): (file: File) => void {
-    return (file: File) => {
-        if (map.has($element.id)) map.delete($element.id);
-        videosShelf.appendChild(new RecordedVideo({
-            title: title,
-            src: URL.createObjectURL(file)
-        }));
-        shelf.removeChild($element);
-    };
-}
-
-function isValidName(name: string) {
-    return name.length > 0;
+function removeSession($element: RecordingSessionElement) {
+    if (map.has($element.id)) map.delete($element.id);
+    shelf.removeChild($element);
 }
