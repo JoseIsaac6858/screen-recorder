@@ -30,20 +30,15 @@ class Session {
         this.stop = this.stop.bind(this);
         this.start();
     }
-    start(startNew: boolean = false) {
-        clearInterval(this.durationCount);
-        if (startNew) {
-            this.recorder.onstop = null;
-            this.recorder.ondataavailable = null;
-            this.recorder = new MediaRecorder(this.stream, {
-                mimeType: mimeType,
-            });
-        }
+    start() {
         this.recorder.ondataavailable = (event) => {
             this.data.push(event.data)
         };
         this.recorder.onstop = this.stop;
         this.recorder.start();
+        this.resumeTimeCounter();
+    }
+    private resumeTimeCounter() {
         this.durationCount = setInterval(() => {
             this.duration++;
             if (this.onDurationChange) {
@@ -51,9 +46,10 @@ class Session {
             }
         }, 1000);
     }
+
     stop() {
-        clearInterval(this.durationCount);
-        if (this.recorder.state === "recording") {
+        this.pauseTimeCounter();
+        if (this.recorder.state !== "inactive") {
             this.recorder.stop();
             return;
         }
@@ -64,15 +60,20 @@ class Session {
         const file = new File([blob], `${this.id}.webm`, { type: mimeType });
         if (this.endCallback) this.endCallback(file)
     }
+    private pauseTimeCounter() {
+        clearInterval(this.durationCount);
+    }
+
     resume() {
-        this.start(true)
+        this.recorder.resume();
+        this.resumeTimeCounter();
     }
     pause() {
-        clearInterval(this.durationCount);
+        this.pauseTimeCounter();
         this.recorder.pause();
     }
     togglePause() {
-        if (this.recorder.state === "paused") {
+        if (this.recorder.state !== "recording") {
             this.resume();
             return;
         }

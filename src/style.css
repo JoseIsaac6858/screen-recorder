@@ -201,7 +201,7 @@ main {
     border-right: .2rem solid;
 }
 
-.session-button[data-item-id="pause-button"][title="play"]::after {
+.session-button[data-item-id="pause-button"][title="resume"]::after {
     content: "";
     clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
 }

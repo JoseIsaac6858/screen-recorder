@@ -55,8 +55,8 @@ function elementPropsFrom(session: Session, name: string): props {
         kind: session.kind,
         label: session.label,
         duration: SecondsToHHMMSS(session.duration),
-        onEnd: session.stop,
-        onPause: session.togglePause,
+        onEnd: session.stop.bind(session),
+        onPause: session.togglePause.bind(session),
     });
 }
 
