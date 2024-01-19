@@ -25,8 +25,8 @@
                 <button type="submit">start recording</button>
             </div>
         </form>
-        <div class="sessions-shelf" id="shelf">
-        </div>
+        <section class="shelf" id="videos-shelf"> </section>
+        <section class="shelf" id="shelf"></section>
     </main>
 
     <template id="session-template">
@@ -55,8 +55,7 @@
                     <span aria-label="duration">minutes</span>
                 </div>
                 <div>
-                    <button type="button" class="session-button" data-item-id="pause-button"
-                        title="pause"></button>
+                    <button type="button" class="session-button" data-item-id="pause-button" title="pause"></button>
                     <button type="button" class="session-button" title="end recording"
                         data-item-id="end-button"></button>
                     <a href="#" class="session-button" title="end recording" data-item-id="download-button"
@@ -67,6 +66,13 @@
             </div>
             <div class="session-fill"></div>
         </article>
+    </template>
+
+    <template id="recorded-video">
+        <figure>
+            <video controls></video>
+        </figure>
+        <h2>[title]</h2>
     </template>
 
     <script type="module" src="/src/main.ts"></script>

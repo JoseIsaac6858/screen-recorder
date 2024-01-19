@@ -2,8 +2,10 @@ import Session from './Session';
 import './style.css';
 import RecordingSessionElement, { props } from './components/recording-session';
 import { SecondsToHHMMSS } from './utils/time.utils';
+import RecordedVideo from './components/RecordedVideo';
 
 const shelf = document.getElementById("shelf")! as HTMLDivElement;
+const videosShelf = document.getElementById("videos-shelf")! as HTMLDivElement;
 const sessionForm = document.getElementById("session-form")! as HTMLFormElement;
 const button = sessionForm.querySelector<HTMLButtonElement>('button[type="submit"]')!;
 const message = sessionForm.querySelector<HTMLParagraphElement>('[data-item-id="message"]')!;
@@ -29,7 +31,7 @@ async function handleSubmit(event: MouseEvent) {
     map.set(session.id, session);
     sessionElemetOnShelf.video = session.stream;
 
-    session.endCallback = sessionEndCallbackFactory(sessionElemetOnShelf);
+    session.endCallback = sessionEndCallbackFactory(sessionElemetOnShelf, name);
     session.onDurationChange = (duration: number) => {
         sessionElemetOnShelf.duration = duration;
     }
@@ -62,12 +64,14 @@ function pauseSessionFactory(session: Session): () => void {
     return () => session.togglePause();
 }
 
-function sessionEndCallbackFactory(sessionElemetOnShelf: RecordingSessionElement): (file: File) => void {
+function sessionEndCallbackFactory($element: RecordingSessionElement, title: string): (file: File) => void {
     return (file: File) => {
-        if (map.has(sessionElemetOnShelf.id)) map.delete(sessionElemetOnShelf.id);
-        sessionElemetOnShelf.finish({
-            url: URL.createObjectURL(file),
-        });
+        if (map.has($element.id)) map.delete($element.id);
+        videosShelf.appendChild(new RecordedVideo({
+            title: title,
+            src: URL.createObjectURL(file)
+        }));
+        shelf.removeChild($element);
     };
 }
 

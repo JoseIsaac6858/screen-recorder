@@ -53,9 +53,12 @@ class Session {
     }
     stop() {
         clearInterval(this.durationCount);
-        if (this.stream.active) Session.stopStream(this.stream);
         if (this.recorder.state === "recording") {
             this.recorder.stop();
+            return;
+        }
+        if (this.stream.active) {
+            Session.stopStream(this.stream);
         }
         const blob = new Blob(this.data, { type: mimeType });
         const file = new File([blob], `${this.id}.webm`, { type: mimeType });
